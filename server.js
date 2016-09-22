@@ -56,7 +56,7 @@ app.get('/api/', function(req, res) {
         console.log(err);
       }
       else {
-        res.send(doc);
+        res.json(doc);
       }
     })
 });
@@ -75,7 +75,7 @@ app.post('/api/', function(req, res){
       console.log(err);
     }
     else {
-      res.send("Saved Search");
+      res.json("Saved Search");
     }
   })
 });

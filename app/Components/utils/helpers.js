@@ -12,13 +12,13 @@ var helpers = {
 	// This function serves our purpose of running the query to geolocate. 
 	runQuery: function(topic, begin_date, end_date){
 
-		console.log(topic);
+		console.log(topic+"|"+begin_date+"|"+end_date);
 
 		// Based on the searcTopic we will create a queryURL 
 		let queryURLBase = "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=" + authKey + "&q=";
 		//Figure out the geolocation
-//		let queryURL = queryURLBase + topic + "&pretty=1" +"&begin_date="+begin_date + "&end_date="+end_date;
-		let queryURL = queryURLBase + topic;
+		let queryURL = queryURLBase + topic + "&pretty=1" +"&begin_date="+begin_date + "&end_date="+end_date;
+//		let queryURL = queryURLBase + topic;
 
 		return axios.get(queryURL)
 			.then(function(response){
@@ -26,8 +26,10 @@ var helpers = {
 				console.log(response);
 				console.log(response.data.response.docs[0]);
 				return response.data.response.docs[0];
-		})
 
+			}).catch(function(error) {
+				console.log(error);
+			});
 	},
 
 	// This function hits our own server to retrieve the record of query results

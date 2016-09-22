@@ -15,28 +15,36 @@ var Form = React.createClass({
 
 	// This function will respond to the user input 
 	handleChange: function(event){
-
+		console.log("CHANGE");
+		//console.log("|"+event.target.id+"|"+event.target.value+"|");
+    
     	// Here we create syntax to capture any change in text to the search topics (pre-search).
     	// See this Stack Overflow answer for more details: 
     	// http://stackoverflow.com/questions/21029999/react-js-identifying-different-inputs-with-one-onchange-handler
     	var newState = {};
     	newState[event.target.id] = event.target.value;
-    	this.setState(newState);
 
+    	this.setState(newState);
 	},
 
 	// When a user submits... 
 	handleClick: function(){
 		console.log("CLICK");
-		console.log(this.state.topic);
+		console.log("DATE: "+Date.now());
 
 		// If a search topic is entered, set the parent's topic
 		if(this.state.topic.trim() != "")
 			this.props.setTopic(this.state.topic);
+
 		if(this.state.startYear.trim() != "")
 			this.props.setStartYear(this.state.startYear);
+		else
+			this.props.setStartYear("01/01/2016");
+
 		if(this.state.topic.trim() != "")
 			this.props.setEndYear(this.state.endYear);
+		else
+			this.props.setEndYear("12/31/2016");			
 	},
 
 	// Here we render the function

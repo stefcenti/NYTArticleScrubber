@@ -19776,7 +19776,7 @@
 		getInitialState: function getInitialState() {
 			return {
 				searchTopic: "",
-				results: "",
+				result: "",
 				startYear: "",
 				endYear: "",
 				history: [] /*Note how we added in this history state variable*/
@@ -19791,16 +19791,18 @@
 		},
 
 		// This function allows childrens to update the parent.
-		setStartYear: function setStartYear(startYear) {
+		setStartYear: function setStartYear(year) {
+			console.log("StartYear: " + year);
 			this.setState({
-				startYear: startYear
+				startYear: year
 			});
 		},
 
 		// This function allows childrens to update the parent.
-		setEndYear: function setEndYear(endYear) {
+		setEndYear: function setEndYear(year) {
+			console.log("EndYear: " + year);
 			this.setState({
-				endYear: endYear
+				endYear: year
 			});
 		},
 
@@ -19811,13 +19813,15 @@
 				console.log("UPDATED");
 
 				// Run the query for the address
-				helpers.runQuery(this.state.searchTopic).then(function (data) {
+				helpers.runQuery(this.state.searchTopic, this.state.startYear, this.state.endYear).then(function (data) {
 					if (data != this.state.results) {
-						console.log("Address", data);
+						console.log("Articles", data);
 
-						this.setState({
-							results: data
-						});
+						/* TODO: fix this part to get the article text.
+	     this.setState({
+	     	results: data
+	     });
+	     */
 
 						// After we've received the result... then post the search topic to our history. 
 						helpers.postHistory(this.state.searchTopic).then(function (data) {
@@ -19885,9 +19889,7 @@
 					React.createElement(
 						'div',
 						{ className: 'col-md-6' },
-						React.createElement(Form, { setTopic: this.setTopic,
-							setStartYear: this.setStartYear,
-							setEndYear: this.setEndYear })
+						React.createElement(Form, { setTopic: this.setTopic, setStartYear: this.setStartYear, setEndYear: this.setEndYear })
 					),
 					React.createElement(
 						'div',
@@ -19932,24 +19934,29 @@
 
 		// This function will respond to the user input 
 		handleChange: function handleChange(event) {
+			console.log("CHANGE");
+			//console.log("|"+event.target.id+"|"+event.target.value+"|");
 
 			// Here we create syntax to capture any change in text to the search topics (pre-search).
 			// See this Stack Overflow answer for more details: 
 			// http://stackoverflow.com/questions/21029999/react-js-identifying-different-inputs-with-one-onchange-handler
 			var newState = {};
 			newState[event.target.id] = event.target.value;
+
 			this.setState(newState);
 		},
 
 		// When a user submits... 
 		handleClick: function handleClick() {
 			console.log("CLICK");
-			console.log(this.state.topic);
+			console.log("DATE: " + Date.now());
 
 			// If a search topic is entered, set the parent's topic
 			if (this.state.topic.trim() != "") this.props.setTopic(this.state.topic);
-			if (this.state.startYear.trim() != "") this.props.setStartYear(this.state.startYear);
-			if (this.state.topic.trim() != "") this.props.setEndYear(this.state.endYear);
+
+			if (this.state.startYear.trim() != "") this.props.setStartYear(this.state.startYear);else this.props.setStartYear("01/01/2016");
+
+			if (this.state.topic.trim() != "") this.props.setEndYear(this.state.endYear);else this.props.setEndYear("12/31/2016");
 		},
 
 		// Here we render the function
@@ -20124,19 +20131,21 @@
 		// This function serves our purpose of running the query to geolocate. 
 		runQuery: function runQuery(topic, begin_date, end_date) {
 
-			console.log(topic);
+			console.log(topic + "|" + begin_date + "|" + end_date);
 
 			// Based on the searcTopic we will create a queryURL 
 			var queryURLBase = "https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=" + authKey + "&q=";
 			//Figure out the geolocation
-			//		let queryURL = queryURLBase + topic + "&pretty=1" +"&begin_date="+begin_date + "&end_date="+end_date;
-			var queryURL = queryURLBase + topic;
+			var queryURL = queryURLBase + topic + "&pretty=1" + "&begin_date=" + begin_date + "&end_date=" + end_date;
+			//		let queryURL = queryURLBase + topic;
 
 			return axios.get(queryURL).then(function (response) {
 
 				console.log(response);
 				console.log(response.data.response.docs[0]);
 				return response.data.response.docs[0];
+			}).catch(function (error) {
+				console.log(error);
 			});
 		},
 

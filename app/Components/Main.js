@@ -16,7 +16,7 @@ var Main = React.createClass({
 	getInitialState: function(){
 		return {
 			searchTopic: "",
-			results: "",
+			result: "",
 			startYear:"",
 			endYear:"",
 			history: [] /*Note how we added in this history state variable*/
@@ -27,21 +27,23 @@ var Main = React.createClass({
 	setTopic: function(topic){
 		this.setState({
 			searchTopic: topic
-		})
+		});
 	},
 
 	// This function allows childrens to update the parent.
-	setStartYear: function(startYear){
+	setStartYear: function(year){
+		console.log("StartYear: " + year);
 		this.setState({
-			startYear: startYear
-		})
+			startYear: year
+		});
 	},
 
 	// This function allows childrens to update the parent.
-	setEndYear: function(endYear){
+	setEndYear: function(year){
+		console.log("EndYear: " + year);
 		this.setState({
-			endYear: endYear
-		})
+			endYear: year
+		});
 	},
 
 	// If the component changes (i.e. if a search is entered)... 
@@ -51,15 +53,17 @@ var Main = React.createClass({
 			console.log("UPDATED");
 
 			// Run the query for the address
-			helpers.runQuery(this.state.searchTopic)
+			helpers.runQuery(this.state.searchTopic, this.state.startYear, this.state.endYear)
 				.then(function(data){
 					if (data != this.state.results)
 					{
-						console.log("Address", data);
+						console.log("Articles", data);
 
+						/* TODO: fix this part to get the article text.
 						this.setState({
 							results: data
-						})
+						});
+						*/
 
 						// After we've received the result... then post the search topic to our history. 
 						helpers.postHistory(this.state.searchTopic)
@@ -118,9 +122,7 @@ var Main = React.createClass({
 
 					<div className="col-md-6">
 					
-						<Form setTopic={this.setTopic} 
-							setStartYear={this.setStartYear}
-							setEndYear={this.setEndYear}/>
+						<Form setTopic={this.setTopic} setStartYear={this.setStartYear} setEndYear={this.setEndYear}/>
 
 					</div>
 
