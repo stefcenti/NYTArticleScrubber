@@ -19776,9 +19776,9 @@
 		getInitialState: function getInitialState() {
 			return {
 				searchTopic: "",
-				result: "",
 				startYear: "",
 				endYear: "",
+				results: [],
 				history: [] /*Note how we added in this history state variable*/
 			};
 		},
@@ -19807,6 +19807,13 @@
 		},
 
 		// If the component changes (i.e. if a search is entered)... 
+		// This code is from the NYT search.  It is executed whenever the search
+		// topic has changed.  Since we are not searching until "Search" is clicked
+		// we don't need to do anything when the component is updated.
+		// This code also saves the search data in the History (now Article) table.
+		// Since we only save an article when the button associated with the article
+		// is clicked, this functionality needs to be associated with each
+		// button as they are created.
 		componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 
 			if (prevState.searchTopic != this.state.searchTopic) {
@@ -19874,16 +19881,16 @@
 						React.createElement(
 							'h2',
 							{ className: 'text-center' },
-							'Address Finder!'
+							React.createElement(
+								'u',
+								null,
+								'New York Times Article Scrubber'
+							)
 						),
 						React.createElement(
 							'p',
 							{ className: 'text-center' },
-							React.createElement(
-								'em',
-								null,
-								'Enter a landmark to search for its exact address (ex: "Eiffel Tower").'
-							)
+							'Search for and annotate articles of interest!'
 						)
 					),
 					React.createElement(
@@ -19891,11 +19898,7 @@
 						{ className: 'col-md-6' },
 						React.createElement(Form, { setTopic: this.setTopic, setStartYear: this.setStartYear, setEndYear: this.setEndYear })
 					),
-					React.createElement(
-						'div',
-						{ className: 'col-md-6' },
-						React.createElement(Results, { address: this.state.results })
-					)
+					React.createElement('div', { className: 'col-md-6' })
 				),
 				React.createElement(
 					'div',
@@ -19954,9 +19957,12 @@
 			// If a search topic is entered, set the parent's topic
 			if (this.state.topic.trim() != "") this.props.setTopic(this.state.topic);
 
-			if (this.state.startYear.trim() != "") this.props.setStartYear(this.state.startYear);else this.props.setStartYear("01/01/2016");
+			// If start date is not entered, start 1 year prior.
+			// If end date is not entered, end with today's date.
+			// For now, hard code start/end dates if not provided.
+			if (this.state.startYear.trim() != "") this.props.setStartYear(this.state.startYear);else this.props.setStartYear("01012016");
 
-			if (this.state.topic.trim() != "") this.props.setEndYear(this.state.endYear);else this.props.setEndYear("12/31/2016");
+			if (this.state.endYear.trim() != "") this.props.setEndYear(this.state.endYear);else this.props.setEndYear("1212016");
 		},
 
 		// Here we render the function
@@ -20026,7 +20032,6 @@
 	var Results = React.createClass({
 		displayName: "Results",
 
-
 		// Here we render the function
 		render: function render() {
 
@@ -20045,16 +20050,9 @@
 				React.createElement(
 					"div",
 					{ className: "panel-body text-center" },
-					React.createElement(
-						"h1",
-						null,
-						"Address:"
-					),
-					React.createElement(
-						"p",
-						null,
-						this.props.address
-					)
+					this.props.results.map(function (result, i) {
+						{/*							return <p key={i}>{search.location} - {search.date}</p> */}
+					})
 				)
 			);
 		}
@@ -20088,7 +20086,7 @@
 					React.createElement(
 						"h3",
 						{ className: "panel-title text-center" },
-						"Search History"
+						"Saved"
 					)
 				),
 				React.createElement(

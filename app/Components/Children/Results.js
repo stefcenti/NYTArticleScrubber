@@ -14,10 +14,12 @@ var Results = React.createClass({
 					<h3 className="panel-title text-center">Results</h3>
 				</div>
 				<div className="panel-body text-center">
-
-						<h1>Address:</h1>
-						<p>{this.props.address}</p>
-
+					{/* Here we use a map function to loop through an array in JSX*/}
+					{this.props.results.map(function(result, i)
+						{
+{/*							return <p key={i}>{search.location} - {search.date}</p> */}
+						}
+					)}
 				</div>
 			</div>
 

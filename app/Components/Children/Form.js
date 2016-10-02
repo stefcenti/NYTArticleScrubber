@@ -36,15 +36,18 @@ var Form = React.createClass({
 		if(this.state.topic.trim() != "")
 			this.props.setTopic(this.state.topic);
 
+		// If start date is not entered, start 1 year prior.
+		// If end date is not entered, end with today's date.
+		// For now, hard code start/end dates if not provided.
 		if(this.state.startYear.trim() != "")
 			this.props.setStartYear(this.state.startYear);
 		else
-			this.props.setStartYear("01/01/2016");
+			this.props.setStartYear("01012016");
 
-		if(this.state.topic.trim() != "")
+		if(this.state.endYear.trim() != "")
 			this.props.setEndYear(this.state.endYear);
 		else
-			this.props.setEndYear("12/31/2016");			
+			this.props.setEndYear("1212016");			
 	},
 
 	// Here we render the function

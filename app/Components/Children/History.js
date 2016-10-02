@@ -11,7 +11,7 @@ var History = React.createClass({
 
 			<div className="panel panel-default">
 				<div className="panel-heading">
-					<h3 className="panel-title text-center">Search History</h3>
+					<h3 className="panel-title text-center">Saved</h3>
 				</div>
 				<div className="panel-body text-center">
 

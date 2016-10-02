@@ -16,9 +16,9 @@ var Main = React.createClass({
 	getInitialState: function(){
 		return {
 			searchTopic: "",
-			result: "",
-			startYear:"",
+			startYear: "",
 			endYear:"",
+			results: [],
 			history: [] /*Note how we added in this history state variable*/
 		}
 	},	
@@ -47,6 +47,13 @@ var Main = React.createClass({
 	},
 
 	// If the component changes (i.e. if a search is entered)... 
+	// This code is from the NYT search.  It is executed whenever the search
+	// topic has changed.  Since we are not searching until "Search" is clicked
+	// we don't need to do anything when the component is updated.
+	// This code also saves the search data in the History (now Article) table.
+	// Since we only save an article when the button associated with the article
+	// is clicked, this functionality needs to be associated with each
+	// button as they are created.
 	componentDidUpdate: function(prevProps, prevState){
 
 		if(prevState.searchTopic != this.state.searchTopic){
@@ -116,8 +123,8 @@ var Main = React.createClass({
 				<div className="row">
 
 					<div className="jumbotron">
-						<h2 className="text-center">Address Finder!</h2>
-						<p className="text-center"><em>Enter a landmark to search for its exact address (ex: "Eiffel Tower").</em></p>
+						<h2 className="text-center"><u>New York Times Article Scrubber</u></h2>
+						<p className="text-center">Search for and annotate articles of interest!</p>
 					</div>
 
 					<div className="col-md-6">
@@ -128,7 +135,7 @@ var Main = React.createClass({
 
 					<div className="col-md-6">
 				
-						<Results address={this.state.results} />
+						{/*<Results result{i}={this.state.result} />*/}
 
 					</div>
 
