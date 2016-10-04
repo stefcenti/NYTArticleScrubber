@@ -2,9 +2,9 @@
 var React = require('react');
 
 // Here we include all of the sub-components
-var Form = require('./Children/Form');
-var Results = require('./Children/Results');
-var History = require('./Children/History');
+var Search = require('./children/Search');
+var Results = require('./children/Results');
+var Saved = require('./children/Saved');
 
 // Helper Function
 var helpers = require('./utils/helpers.js');
@@ -15,11 +15,11 @@ var Main = React.createClass({
 	// Here we set a generic state associated with the number of clicks
 	getInitialState: function(){
 		return {
-			searchTopic: "",
-			startYear: "",
-			endYear:"",
+			topic: "",
+			start: "",
+			end:"",
 			results: [],
-			history: [] /*Note how we added in this history state variable*/
+			saved: []
 		}
 	},	
 
@@ -31,18 +31,18 @@ var Main = React.createClass({
 	},
 
 	// This function allows childrens to update the parent.
-	setStartYear: function(year){
-		console.log("StartYear: " + year);
+	setStart: function(date){
+		console.log("Start: " + date);
 		this.setState({
-			startYear: year
+			start: date
 		});
 	},
 
 	// This function allows childrens to update the parent.
-	setEndYear: function(year){
-		console.log("EndYear: " + year);
+	setEnd: function(date){
+		console.log("EndYear: " + date);
 		this.setState({
-			endYear: year
+			end: date
 		});
 	},
 
@@ -60,7 +60,7 @@ var Main = React.createClass({
 			console.log("UPDATED");
 
 			// Run the query for the address
-			helpers.runQuery(this.state.searchTopic, this.state.startYear, this.state.endYear)
+			helpers.runQuery(this.state.topic, this.state.start, this.state.end)
 				.then(function(data){
 					if (data != this.state.results)
 					{
@@ -73,7 +73,7 @@ var Main = React.createClass({
 						*/
 
 						// After we've received the result... then post the search topic to our history. 
-						helpers.postHistory(this.state.searchTopic)
+						helpers.postHistory(this.state.topic)
 							.then(function(data){
 								console.log("Updated!");
 
@@ -129,13 +129,13 @@ var Main = React.createClass({
 
 					<div className="col-md-6">
 					
-						<Form setTopic={this.setTopic} setStartYear={this.setStartYear} setEndYear={this.setEndYear}/>
+						<Search setTopic={this.setTopic} setStart={this.setStart} setEnd={this.setEnd} />
 
 					</div>
 
 					<div className="col-md-6">
 				
-						{/*<Results result{i}={this.state.result} />*/}
+						<Results results={this.state.results} />
 
 					</div>
 
@@ -143,7 +143,7 @@ var Main = React.createClass({
 
 				<div className="row">
 
-					<History history={this.state.history}/> 
+					<Saved saved={this.state.saved} /> 
 
 				</div>
 

@@ -19760,12 +19760,12 @@
 	var React = __webpack_require__(1);
 
 	// Here we include all of the sub-components
-	var Form = __webpack_require__(160);
-	var Results = __webpack_require__(161);
-	var History = __webpack_require__(162);
+	var Search = __webpack_require__(181);
+	var Results = __webpack_require__(183);
+	var Saved = __webpack_require__(184);
 
 	// Helper Function
-	var helpers = __webpack_require__(163);
+	var helpers = __webpack_require__(161);
 
 	// This is the main component. 
 	var Main = React.createClass({
@@ -19775,11 +19775,11 @@
 		// Here we set a generic state associated with the number of clicks
 		getInitialState: function getInitialState() {
 			return {
-				searchTopic: "",
-				startYear: "",
-				endYear: "",
+				topic: "",
+				start: "",
+				end: "",
 				results: [],
-				history: [] /*Note how we added in this history state variable*/
+				saved: []
 			};
 		},
 
@@ -19791,18 +19791,18 @@
 		},
 
 		// This function allows childrens to update the parent.
-		setStartYear: function setStartYear(year) {
-			console.log("StartYear: " + year);
+		setStart: function setStart(date) {
+			console.log("Start: " + date);
 			this.setState({
-				startYear: year
+				start: date
 			});
 		},
 
 		// This function allows childrens to update the parent.
-		setEndYear: function setEndYear(year) {
-			console.log("EndYear: " + year);
+		setEnd: function setEnd(date) {
+			console.log("EndYear: " + date);
 			this.setState({
-				endYear: year
+				end: date
 			});
 		},
 
@@ -19820,7 +19820,7 @@
 				console.log("UPDATED");
 
 				// Run the query for the address
-				helpers.runQuery(this.state.searchTopic, this.state.startYear, this.state.endYear).then(function (data) {
+				helpers.runQuery(this.state.topic, this.state.start, this.state.end).then(function (data) {
 					if (data != this.state.results) {
 						console.log("Articles", data);
 
@@ -19831,7 +19831,7 @@
 	     */
 
 						// After we've received the result... then post the search topic to our history. 
-						helpers.postHistory(this.state.searchTopic).then(function (data) {
+						helpers.postHistory(this.state.topic).then(function (data) {
 							console.log("Updated!");
 
 							// After we've done the post... then get the updated history
@@ -19896,14 +19896,18 @@
 					React.createElement(
 						'div',
 						{ className: 'col-md-6' },
-						React.createElement(Form, { setTopic: this.setTopic, setStartYear: this.setStartYear, setEndYear: this.setEndYear })
+						React.createElement(Search, { setTopic: this.setTopic, setStart: this.setStart, setEnd: this.setEnd })
 					),
-					React.createElement('div', { className: 'col-md-6' })
+					React.createElement(
+						'div',
+						{ className: 'col-md-6' },
+						React.createElement(Results, { results: this.state.results })
+					)
 				),
 				React.createElement(
 					'div',
 					{ className: 'row' },
-					React.createElement(History, { history: this.state.history })
+					React.createElement(Saved, { saved: this.state.saved })
 				)
 			);
 		}
@@ -19913,210 +19917,14 @@
 	module.exports = Main;
 
 /***/ },
-/* 160 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	// Include React 
-	var React = __webpack_require__(1);
-
-	// This is the form component. 
-	var Form = React.createClass({
-		displayName: "Form",
-
-
-		// Here we set a generic state associated with the text being searched for
-		getInitialState: function getInitialState() {
-			return {
-				topic: "",
-				startYear: "",
-				endYear: ""
-			};
-		},
-
-		// This function will respond to the user input 
-		handleChange: function handleChange(event) {
-			console.log("CHANGE");
-			//console.log("|"+event.target.id+"|"+event.target.value+"|");
-
-			// Here we create syntax to capture any change in text to the search topics (pre-search).
-			// See this Stack Overflow answer for more details: 
-			// http://stackoverflow.com/questions/21029999/react-js-identifying-different-inputs-with-one-onchange-handler
-			var newState = {};
-			newState[event.target.id] = event.target.value;
-
-			this.setState(newState);
-		},
-
-		// When a user submits... 
-		handleClick: function handleClick() {
-			console.log("CLICK");
-			console.log("DATE: " + Date.now());
-
-			// If a search topic is entered, set the parent's topic
-			if (this.state.topic.trim() != "") this.props.setTopic(this.state.topic);
-
-			// If start date is not entered, start 1 year prior.
-			// If end date is not entered, end with today's date.
-			// For now, hard code start/end dates if not provided.
-			if (this.state.startYear.trim() != "") this.props.setStartYear(this.state.startYear);else this.props.setStartYear("01012016");
-
-			if (this.state.endYear.trim() != "") this.props.setEndYear(this.state.endYear);else this.props.setEndYear("1212016");
-		},
-
-		// Here we render the function
-		render: function render() {
-
-			return React.createElement(
-				"div",
-				{ className: "panel panel-default" },
-				React.createElement(
-					"div",
-					{ className: "panel-heading" },
-					React.createElement(
-						"h3",
-						{ className: "panel-title text-center" },
-						"Search"
-					)
-				),
-				React.createElement(
-					"div",
-					{ className: "panel-body text-center" },
-					React.createElement(
-						"form",
-						null,
-						React.createElement(
-							"div",
-							{ className: "form-group" },
-							React.createElement(
-								"h4",
-								{ className: "" },
-								React.createElement(
-									"strong",
-									null,
-									"Topic"
-								)
-							),
-							React.createElement("input", { type: "text", className: "form-control text-center", id: "topic", onChange: this.handleChange, required: true }),
-							React.createElement("br", null),
-							React.createElement("input", { type: "text", className: "form-control text-center", id: "startYear", onChange: this.handleChange, required: true }),
-							React.createElement("br", null),
-							React.createElement("input", { type: "text", className: "form-control text-center", id: "endYear", onChange: this.handleChange, required: true }),
-							React.createElement("br", null),
-							React.createElement(
-								"button",
-								{ type: "button", className: "btn btn-primary", onClick: this.handleClick },
-								"Search"
-							)
-						)
-					)
-				)
-			);
-		}
-	});
-
-	// Export the component back for use in other files
-	module.exports = Form;
-
-/***/ },
+/* 160 */,
 /* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	// Include React 
-	var React = __webpack_require__(1);
-
-	// This is the results component
-	var Results = React.createClass({
-		displayName: "Results",
-
-		// Here we render the function
-		render: function render() {
-
-			return React.createElement(
-				"div",
-				{ className: "panel panel-default" },
-				React.createElement(
-					"div",
-					{ className: "panel-heading" },
-					React.createElement(
-						"h3",
-						{ className: "panel-title text-center" },
-						"Results"
-					)
-				),
-				React.createElement(
-					"div",
-					{ className: "panel-body text-center" },
-					this.props.results.map(function (result, i) {
-						{/*							return <p key={i}>{search.location} - {search.date}</p> */}
-					})
-				)
-			);
-		}
-	});
-
-	// Export the component back for use in other files
-	module.exports = Results;
-
-/***/ },
-/* 162 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	// Include React 
-	var React = __webpack_require__(1);
-
-	// This is the history component. It will be used to show a log of  recent searches.
-	var History = React.createClass({
-		displayName: "History",
-
-		// Here we render the function
-		render: function render() {
-
-			return React.createElement(
-				"div",
-				{ className: "panel panel-default" },
-				React.createElement(
-					"div",
-					{ className: "panel-heading" },
-					React.createElement(
-						"h3",
-						{ className: "panel-title text-center" },
-						"Saved"
-					)
-				),
-				React.createElement(
-					"div",
-					{ className: "panel-body text-center" },
-					this.props.history.map(function (search, i) {
-						return React.createElement(
-							"p",
-							{ key: i },
-							search.location,
-							" - ",
-							search.date
-						);
-					})
-				)
-			);
-		}
-	});
-
-	// Export the component back for use in other files
-	module.exports = History;
-
-/***/ },
-/* 163 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
 	// Include the axios package for performing HTTP requests (promise based alternative to request)
-	var axios = __webpack_require__(164);
+	var axios = __webpack_require__(162);
 
 	// Geocoder API
 	// var geocodeAPI = "35e5548c618555b1a43eb4759d26b260";
@@ -20213,25 +20021,25 @@
 	module.exports = helpers;
 
 /***/ },
-/* 164 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(165);
+	module.exports = __webpack_require__(163);
 
 /***/ },
-/* 165 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var defaults = __webpack_require__(166);
-	var utils = __webpack_require__(167);
-	var dispatchRequest = __webpack_require__(169);
-	var InterceptorManager = __webpack_require__(178);
-	var isAbsoluteURL = __webpack_require__(179);
-	var combineURLs = __webpack_require__(180);
-	var bind = __webpack_require__(181);
-	var transformData = __webpack_require__(173);
+	var defaults = __webpack_require__(164);
+	var utils = __webpack_require__(165);
+	var dispatchRequest = __webpack_require__(167);
+	var InterceptorManager = __webpack_require__(176);
+	var isAbsoluteURL = __webpack_require__(177);
+	var combineURLs = __webpack_require__(178);
+	var bind = __webpack_require__(179);
+	var transformData = __webpack_require__(171);
 
 	function Axios(defaultConfig) {
 	  this.defaults = utils.merge({}, defaultConfig);
@@ -20320,7 +20128,7 @@
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(182);
+	axios.spread = __webpack_require__(180);
 
 	// Provide aliases for supported request methods
 	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
@@ -20348,13 +20156,13 @@
 
 
 /***/ },
-/* 166 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var utils = __webpack_require__(167);
-	var normalizeHeaderName = __webpack_require__(168);
+	var utils = __webpack_require__(165);
+	var normalizeHeaderName = __webpack_require__(166);
 
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -20426,7 +20234,7 @@
 
 
 /***/ },
-/* 167 */
+/* 165 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20709,12 +20517,12 @@
 
 
 /***/ },
-/* 168 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var utils = __webpack_require__(167);
+	var utils = __webpack_require__(165);
 
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -20727,7 +20535,7 @@
 
 
 /***/ },
-/* 169 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -20749,10 +20557,10 @@
 	        adapter = config.adapter;
 	      } else if (typeof XMLHttpRequest !== 'undefined') {
 	        // For browsers use XHR adapter
-	        adapter = __webpack_require__(170);
+	        adapter = __webpack_require__(168);
 	      } else if (typeof process !== 'undefined') {
 	        // For node use HTTP adapter
-	        adapter = __webpack_require__(170);
+	        adapter = __webpack_require__(168);
 	      }
 
 	      if (typeof adapter === 'function') {
@@ -20768,18 +20576,18 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 170 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
-	var utils = __webpack_require__(167);
-	var buildURL = __webpack_require__(171);
-	var parseHeaders = __webpack_require__(172);
-	var transformData = __webpack_require__(173);
-	var isURLSameOrigin = __webpack_require__(174);
-	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(175);
-	var settle = __webpack_require__(176);
+	var utils = __webpack_require__(165);
+	var buildURL = __webpack_require__(169);
+	var parseHeaders = __webpack_require__(170);
+	var transformData = __webpack_require__(171);
+	var isURLSameOrigin = __webpack_require__(172);
+	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(173);
+	var settle = __webpack_require__(174);
 
 	module.exports = function xhrAdapter(resolve, reject, config) {
 	  var requestData = config.data;
@@ -20876,7 +20684,7 @@
 	  // This is only done if running in a standard browser environment.
 	  // Specifically not if we're in a web worker, or react-native.
 	  if (utils.isStandardBrowserEnv()) {
-	    var cookies = __webpack_require__(177);
+	    var cookies = __webpack_require__(175);
 
 	    // Add xsrf header
 	    var xsrfValue = config.withCredentials || isURLSameOrigin(config.url) ?
@@ -20937,12 +20745,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 171 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var utils = __webpack_require__(167);
+	var utils = __webpack_require__(165);
 
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -21011,12 +20819,12 @@
 
 
 /***/ },
-/* 172 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var utils = __webpack_require__(167);
+	var utils = __webpack_require__(165);
 
 	/**
 	 * Parse headers into an object
@@ -21054,12 +20862,12 @@
 
 
 /***/ },
-/* 173 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var utils = __webpack_require__(167);
+	var utils = __webpack_require__(165);
 
 	/**
 	 * Transform the data for a request or a response
@@ -21080,12 +20888,12 @@
 
 
 /***/ },
-/* 174 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var utils = __webpack_require__(167);
+	var utils = __webpack_require__(165);
 
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -21154,7 +20962,7 @@
 
 
 /***/ },
-/* 175 */
+/* 173 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21196,7 +21004,7 @@
 
 
 /***/ },
-/* 176 */
+/* 174 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21220,12 +21028,12 @@
 
 
 /***/ },
-/* 177 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var utils = __webpack_require__(167);
+	var utils = __webpack_require__(165);
 
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -21279,12 +21087,12 @@
 
 
 /***/ },
-/* 178 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var utils = __webpack_require__(167);
+	var utils = __webpack_require__(165);
 
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -21337,7 +21145,7 @@
 
 
 /***/ },
-/* 179 */
+/* 177 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21357,7 +21165,7 @@
 
 
 /***/ },
-/* 180 */
+/* 178 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21375,7 +21183,7 @@
 
 
 /***/ },
-/* 181 */
+/* 179 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21392,7 +21200,7 @@
 
 
 /***/ },
-/* 182 */
+/* 180 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21423,6 +21231,224 @@
 	  };
 	};
 
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	// Include React 
+	var React = __webpack_require__(1);
+
+	// Include Helper Functions
+	var helpers = __webpack_require__(161);
+
+	// This is the Search component. 
+	var Search = React.createClass({
+		displayName: 'Search',
+
+
+		// Here we set a generic state associated with the text being searched for
+		getInitialState: function getInitialState() {
+			return {
+				topic: "",
+				start: "",
+				end: ""
+			};
+		},
+
+		// This function will respond to the user input 
+		handleChange: function handleChange(event) {
+			console.log("CHANGE");
+			//console.log("|"+event.target.id+"|"+event.target.value+"|");
+
+			// Here we create syntax to capture any change in text to the search topics (pre-search).
+			// See this Stack Overflow answer for more details: 
+			// http://stackoverflow.com/questions/21029999/react-js-identifying-different-inputs-with-one-onchange-handler
+			var newState = {};
+			newState[event.target.id] = event.target.value;
+
+			this.setState(newState);
+		},
+
+		// When a user clicks Search... 
+		handleClick: function handleClick() {
+			console.log("CLICK");
+			console.log("DATE: " + Date.now());
+
+			// Set to default values if none are entered
+			// TODO: change default dates for 1 year prior up to current date
+			if (this.state.topic.trim() == "") this.state.topic = "news";
+			if (this.state.start.trim() == "") this.state.start = "01012016";
+			if (this.state.end.trim() == "") this.state.end = "12122016";
+
+			// Update the state of the Main form
+			this.props.setTopic(this.state.topic);
+			this.props.setStart(this.state.start);
+			this.props.setEnd(this.state.end);
+
+			helpers.runQuery(this.state.topic, this.state.start, this.state.end);
+		},
+
+		// Here we render the function
+		render: function render() {
+
+			return React.createElement(
+				'div',
+				{ className: 'panel panel-default' },
+				React.createElement(
+					'div',
+					{ className: 'panel-heading' },
+					React.createElement(
+						'h2',
+						{ className: 'panel-title text-center' },
+						React.createElement(
+							'strong',
+							null,
+							'Search'
+						)
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'panel-body text-center' },
+					React.createElement(
+						'form',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'form-group' },
+							React.createElement(
+								'h5',
+								{ className: '' },
+								React.createElement(
+									'strong',
+									null,
+									'Topic'
+								)
+							),
+							React.createElement('input', { type: 'text', className: 'form-control text-center', id: 'topic', onChange: this.handleChange, required: true }),
+							React.createElement(
+								'h5',
+								{ className: '' },
+								React.createElement(
+									'strong',
+									null,
+									'Start Date'
+								)
+							),
+							React.createElement('input', { type: 'text', className: 'form-control text-center', id: 'start', onChange: this.handleChange, required: true }),
+							React.createElement(
+								'h5',
+								{ className: '' },
+								React.createElement(
+									'strong',
+									null,
+									'End Date'
+								)
+							),
+							React.createElement('input', { type: 'text', className: 'form-control text-center', id: 'end', onChange: this.handleChange, required: true }),
+							React.createElement('br', null),
+							React.createElement(
+								'button',
+								{ type: 'button', className: 'btn btn-primary', onClick: this.handleClick },
+								'Search'
+							)
+						)
+					)
+				)
+			);
+		}
+	});
+
+	// Export the component back for use in other files
+	module.exports = Search;
+
+/***/ },
+/* 182 */,
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	// Include React 
+	var React = __webpack_require__(1);
+
+	// This is the results component
+	var Results = React.createClass({
+		displayName: "Results",
+
+		// Here we render the function
+		render: function render() {
+
+			return React.createElement(
+				"div",
+				{ className: "panel panel-default" },
+				React.createElement(
+					"div",
+					{ className: "panel-heading" },
+					React.createElement(
+						"h3",
+						{ className: "panel-title text-center" },
+						"Results"
+					)
+				),
+				React.createElement(
+					"div",
+					{ className: "panel-body text-center" },
+					this.props.results.map(function (result, i) {
+						{/*							return <p key={i}>{search.location} - {search.date}</p> */}
+					})
+				)
+			);
+		}
+	});
+
+	// Export the component back for use in other files
+	module.exports = Results;
+
+/***/ },
+/* 184 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	// Include React 
+	var React = __webpack_require__(1);
+
+	// This is the results component
+	var Saved = React.createClass({
+		displayName: "Saved",
+
+		// Here we render the function
+		render: function render() {
+
+			return React.createElement(
+				"div",
+				{ className: "panel panel-default" },
+				React.createElement(
+					"div",
+					{ className: "panel-heading" },
+					React.createElement(
+						"h3",
+						{ className: "panel-title text-center" },
+						"Saved Articles"
+					)
+				),
+				React.createElement(
+					"div",
+					{ className: "panel-body text-center" },
+					this.props.saved.map(function (result, i) {
+						{/*							return <p key={i}>{search.location} - {search.date}</p> */}
+					})
+				)
+			);
+		}
+	});
+
+	// Export the component back for use in other files
+	module.exports = Saved;
 
 /***/ }
 /******/ ]);
